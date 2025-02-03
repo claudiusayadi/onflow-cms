@@ -1,78 +1,96 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, ConflictException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from '../db/db.provider';
 import * as schema from './posts.schema';
 
 @Injectable()
-export class UsersService {
+export class PostsService {
   constructor(
     @Inject(DRIZZLE)
     private readonly db: NodePgDatabase<typeof schema>,
   ) {}
 
-  async create(createPostDto: typeof schema.posts.$inferInsert) {
-    const existing = await this.db
-      .select()
-      .from(schema.posts)
-      .where(eq(schema.posts.title, createPostDto.title))
-      .limit(1);
+  async create(postData: typeof schema.posts.$inferInsert) {
+    const existing = await this.db.query.posts.findFirst({
+      where: eq(schema.posts.title, postData.title),
+    });
 
-    if (existing.length)
-      throw new ConflictException(
-        `Post with title ${createPostDto.title} already exists`,
-      );
+    if (existing) {
+      throw new ConflictException('A post with this title already exists');
+    }
 
-    return await this.db.insert(schema.posts).values(createPostDto).returning();
+    const doc = await this.db
+      .insert(schema.posts)
+      .values(postData)
+      .returning();
+
+    return doc[0];
   }
 
   async findAll() {
-    return await this.db.select().from(schema.posts);
+    return await this.db.query.posts.findMany({
+      with: {
+        author: true,
+        tags: true,
+        comments: true,
+      },
+    });
   }
 
-  async findOne(id: number) {
-    const post = await this.db
-      .select()
-      .from(schema.posts)
-      .where(eq(schema.posts.id, id))
-      .limit(1);
+  async findOne(id: string) {
+    const post = await this.db.query.posts.findFirst({
+      where: eq(schema.posts.id, id),
+      with: {
+        author: true,
+        tags: true,
+        comments: {
+          with: {
+            user: true,
+          },
+        },
+      },
+    });
 
-    if (!post.length) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
+    if (!post) {
+      throw new NotFoundException(`Post with id ${id} not found`);
     }
 
-    return post[0];
+    return post;
   }
 
-  async update(id: number, updatePostDto: typeof schema.posts.$inferUpdate) {
-    const updated = await this.db
+  async update(id: string, updateData: typeof schema.posts.$inferInsert) {
+    const existingPost = await this.db.query.posts.findFirst({
+      where: eq(schema.posts.title, updateData.title),
+    });
+
+    if (existingPost && existingPost.id !== id) {
+      throw new ConflictException('A post with this title already exists');
+    }
+
+    const updatedPosts = await this.db
       .update(schema.posts)
-      .set(updatePostDto)
+      .set(updateData)
       .where(eq(schema.posts.id, id))
       .returning();
 
-    if (!updated.length) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
+    if (!updatedPosts.length) {
+      throw new NotFoundException(`Post with id ${id} not found`);
     }
 
-    return updated[0];
+    return updatedPosts[0];
   }
 
-  async remove(id: number) {
-    const deleted = await this.db
+  async remove(id: string) {
+    const deletedPosts = await this.db
       .delete(schema.posts)
       .where(eq(schema.posts.id, id))
       .returning();
 
-    if (!deleted.length) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
+    if (!deletedPosts.length) {
+      throw new NotFoundException(`Post with id ${id} not found`);
     }
 
-    return deleted[0];
+    return deletedPosts[0];
   }
 }

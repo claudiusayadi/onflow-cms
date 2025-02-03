@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "onflow-cms",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

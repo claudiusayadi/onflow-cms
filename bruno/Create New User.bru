@@ -1,0 +1,19 @@
+meta {
+  name: Create New User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+   "email": "hello@dovely.tech",
+  "password": "heythere",
+  "role": "admin"
+  }
+}

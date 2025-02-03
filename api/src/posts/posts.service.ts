@@ -1,14 +1,25 @@
-import { Injectable, NotFoundException, Inject, ConflictException } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { DRIZZLE } from '../db/db.provider';
+import {
+  Injectable,
+  NotFoundException,
+  Inject,
+  ConflictException
+} from '@nestjs/common';
+import {
+  eq
+} from 'drizzle-orm';
+import {
+  NodePgDatabase
+} from 'drizzle-orm/node-postgres';
+import {
+  DRIZZLE
+} from '../db/db.provider';
 import * as schema from './posts.schema';
 
 @Injectable()
 export class PostsService {
   constructor(
     @Inject(DRIZZLE)
-    private readonly db: NodePgDatabase<typeof schema>,
+    private readonly db: NodePgDatabase < typeof schema >,
   ) {}
 
   async create(postData: typeof schema.posts.$inferInsert) {
@@ -21,9 +32,9 @@ export class PostsService {
     }
 
     const doc = await this.db
-      .insert(schema.posts)
-      .values(postData)
-      .returning();
+    .insert(schema.posts)
+    .values(postData)
+    .returning();
 
     return doc[0];
   }
@@ -69,10 +80,10 @@ export class PostsService {
     }
 
     const updatedPosts = await this.db
-      .update(schema.posts)
-      .set(updateData)
-      .where(eq(schema.posts.id, id))
-      .returning();
+    .update(schema.posts)
+    .set(updateData)
+    .where(eq(schema.posts.id, id))
+    .returning();
 
     if (!updatedPosts.length) {
       throw new NotFoundException(`Post with id ${id} not found`);
@@ -83,9 +94,9 @@ export class PostsService {
 
   async remove(id: string) {
     const deletedPosts = await this.db
-      .delete(schema.posts)
-      .where(eq(schema.posts.id, id))
-      .returning();
+    .delete(schema.posts)
+    .where(eq(schema.posts.id, id))
+    .returning();
 
     if (!deletedPosts.length) {
       throw new NotFoundException(`Post with id ${id} not found`);

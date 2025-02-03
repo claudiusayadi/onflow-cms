@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import * as bcrypt from 'bcrypt';
+import { hash } from 'bcrypt';
 import { DRIZZLE } from '../db/db.provider';
 import * as schema from './users.schema';
 import type { UpdateUserDto } from './users.dto';
@@ -30,7 +30,7 @@ export class UsersService {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 12);
+    const hashedPassword = await hash(createUserDto.password as string, 12);
 
     const insertedUsers = await this.db
       .insert(schema.users)

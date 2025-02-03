@@ -1,34 +1,43 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { DRIZZLE } from '../db/db.provider';
+import {
+  Injectable,
+  NotFoundException,
+  Inject
+} from '@nestjs/common';
+import {
+  eq
+} from 'drizzle-orm';
+import {
+  NodePgDatabase
+} from 'drizzle-orm/node-postgres';
+import {
+  DRIZZLE
+} from '../db/db.provider';
 import * as schema from './tags.schema';
-import type { CreateTagDto, UpdateTagDto } from './tags.dto';
+import type {
+  CreateTagDto,
+  UpdateTagDto
+} from './tags.dto';
 
-@Injectable()
+@Injectable
 export class TagsService {
   constructor(
     @Inject(DRIZZLE)
-    private readonly db: NodePgDatabase<typeof schema>,
+    private readonly db: NodePgDatabase < typeof schema >,
   ) {}
 
-  async create(createTagDto: CreateTagDto) {
-    const existing = await this.db
-      .select()
-      .from(schema.tags)
-      .where(eq(schema.tags.name, createTagDto.name));
-    if (existing.length > 0) {
-      throw new NotFoundException(
-        `Tag with name ${createTagDto.name} already exists`,
-      );
-    }
+  async create(name: string) {
+    const existing = await this.db.query.tags.findFirst({
+      where: eq(schema.tags.name, name),
+    });
+    if (existing) return existingTag;
 
-    const inserted = await this.db
-      .insert(schema.tags)
-      .values({ name: createTagDto.name })
-      .returning();
-
-    return inserted[0];
+    const docs = await this.db
+    .insert(schema.tags)
+    .values({
+      name
+    })
+    .returning();
+    return docs[0];
   }
 
   async findAll() {
@@ -36,37 +45,21 @@ export class TagsService {
   }
 
   async findOne(id: string) {
-    const result = await this.db
-      .select()
-      .from(schema.tags)
-      .where(eq(schema.tags.id, id));
-
-    if (!result || result.length === 0) {
+    const result = await this.db.query.tags.findFirst({
+      where: eq(schema.tags.id, id),
+    });
+    if (!result) {
       throw new NotFoundException(`Tag with id ${id} not found`);
     }
-    return result[0];
-  }
-
-  async update(id: string, updateTagDto: UpdateTagDto) {
-    const updated = await this.db
-      .update(schema.tags)
-      .set({ name: updateTagDto.name })
-      .where(eq(schema.tags.id, id))
-      .returning();
-
-    if (!updated || updated.length === 0) {
-      throw new NotFoundException(`Tag with id ${id} not found`);
-    }
-    return updated[0];
+    return result;
   }
 
   async remove(id: string) {
     const deleted = await this.db
-      .delete(schema.tags)
-      .where(eq(schema.tags.id, id))
-      .returning();
-
-    if (!deleted || deleted.length === 0) {
+    .delete(schema.tags)
+    .where(eq(schema.tags.id, id))
+    .returning();
+    if (!deleted.length) {
       throw new NotFoundException(`Tag with id ${id} not found`);
     }
     return deleted[0];

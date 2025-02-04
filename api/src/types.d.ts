@@ -1,11 +1,8 @@
 import { ApiTypes } from '../api/src/app';
-import type { commentsInsertSchema } from '../api/src/db/schema/comments';
-import type { postsInsertSchema } from '../api/src/db/schema/posts';
-import type { tagsInsertSchema } from '../api/src/db/schema/tags';
-import type {
-	usersInsertSchema,
-	profileInsertSchema,
-} from '../api/src/db/schema/users';
+import type { commentsInsertSchema } from './db/schema/comments';
+import type { postsInsertSchema } from './db/schema/posts';
+import type { tagsInsertSchema } from './db/schema/tags';
+import type { usersInsertSchema, profileInsertSchema } from './db/schema/users';
 
 export { ApiTypes };
 

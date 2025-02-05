@@ -5,9 +5,10 @@ import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { nanoid } from 'nanoid';
 import { users } from '@/db/schema/users';
-import { userSchema } from '@/types';
+import { userSchema } from '@shared/types';
 import { zValidator } from '@hono/zod-validator';
 import db from '@/db';
+import { sendTokens } from '@/lib/jwt';
 
 const authRoutes = new Hono()
 	.post('/signup', zValidator('json', userSchema), async c => {
@@ -43,25 +44,21 @@ const authRoutes = new Hono()
 			.where(eq(users.username, username))
 			.limit(1);
 
-		if (!user || user.password !== verifier(user.password, password)) {
+		if (!user || !(await verifier(user.password, password))) {
 			throw new HTTPException(401, {
 				message: 'Invalid credentials',
 			});
 		}
-	})
 
-	.get('/callback', async c => {
-		const url = new URL(c.req.url);
-		await kindeClient.handleRedirectToApp(sessionManager(c), url);
-		return c.redirect('/');
-	})
-	.get('/logout', async c => {
-		const url = await kindeClient.logout(sessionManager(c));
-		return c.redirect(url.toString());
-	})
-	.get('/me', getUser, async c => {
-		const user = c.var.user;
-		return c.json({ user });
+		await sendTokens(c, user.id);
+
+		return c.json(
+			{
+				success: true,
+				message: 'Login successful',
+			},
+			200
+		);
 	});
 
 export default authRoutes;

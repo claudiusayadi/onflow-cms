@@ -1,19 +1,19 @@
 import type { ErrorHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
-const onError: ErrorHandler = (err, c) => {
+const onError: ErrorHandler = async (err, c) => {
 	if (err instanceof HTTPException) {
-		const response =
+		return (
 			err.res ??
 			c.json(
 				{
 					success: false,
-					error: err.message || 'HTTP Exception occurred',
+					error: err.message,
 					status: err.status,
 				},
 				err.status
-			);
-		return response;
+			)
+		);
 	}
 
 	// For non-HTTPException errors

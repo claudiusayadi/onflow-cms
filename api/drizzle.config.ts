@@ -1,10 +1,11 @@
+import { env } from '@/config';
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
 	out: './drizzle',
-	schema: './api/db/schema',
+	schema: './src/db/schema',
 	dialect: 'postgresql',
 	dbCredentials: {
-		url: Bun.env.DB_URL!,
+		url: env.DATABASE_URL,
 	},
 });

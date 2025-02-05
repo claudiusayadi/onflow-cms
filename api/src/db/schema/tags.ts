@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, primaryKey, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, primaryKey, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { posts } from './posts';
 import { text } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 export const tags = pgTable('tags', {
-	id: uuid('id').defaultRandom().primaryKey(),
+	id: varchar('id').primaryKey(),
 	name: text('name').notNull().unique(),
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
@@ -18,8 +18,8 @@ export const tagsRelations = relations(tags, ({ many }) => ({
 export const postsToTags = pgTable(
 	'posts_to_tags',
 	{
-		postId: uuid('post_id').references(() => posts.id),
-		tagId: uuid('tag_id').references(() => tags.id),
+		postId: varchar('post_id').references(() => posts.id),
+		tagId: varchar('tag_id').references(() => tags.id),
 	},
 	t => [primaryKey({ columns: [t.postId, t.tagId] })]
 );

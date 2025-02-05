@@ -1,13 +1,13 @@
-import { pgTable, uuid, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, text, timestamp } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { posts } from './posts';
 import { comments } from './comments';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 export const users = pgTable('users', {
-	id: varchar('id', { length: 20 }).primaryKey(),
-	username: varchar('username', { length: 20 }).unique().notNull(),
-	password: text().notNull(),
+	id: varchar('id').primaryKey(),
+	username: varchar('username').unique().notNull(),
+	password: text('password').notNull(),
 	role: text('role').notNull().default('reader'),
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
@@ -25,8 +25,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 // Additional user details -  (one-to-one with users)
 export const profile = pgTable('profile', {
-	id: uuid('id').defaultRandom().primaryKey(),
-	userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+	id: varchar('id').primaryKey(),
+	userId: varchar('user_id').references(() => users.id, {
+		onDelete: 'cascade',
+	}),
 	email: text('email').notNull().unique(),
 	username: text('username').notNull().unique(),
 	firstName: text('first_name').notNull(),

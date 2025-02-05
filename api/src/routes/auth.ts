@@ -9,10 +9,18 @@ import { userSchema } from '@shared/types';
 import { zValidator } from '@hono/zod-validator';
 import db from '@/db';
 import { sendTokens } from '@/lib/jwt';
+import { deleteCookie, getSignedCookie } from 'hono/cookie';
+import { env } from '@/config';
+import { verify } from 'hono/jwt';
+import { JWTPayload } from 'hono/utils/jwt/types';
+
+interface MyJWTPayload extends JWTPayload {
+	userId: string;
+}
 
 const authRoutes = new Hono()
 	.post('/signup', zValidator('json', userSchema), async c => {
-		const { username, password } = await c.req.valid('json');
+		const { username, password } = c.req.valid('json');
 
 		try {
 			await db.insert(users).values({
@@ -44,11 +52,10 @@ const authRoutes = new Hono()
 			.where(eq(users.username, username))
 			.limit(1);
 
-		if (!user || !(await verifier(user.password, password))) {
+		if (!user || !(await verifier(user.password, password)))
 			throw new HTTPException(401, {
 				message: 'Invalid credentials',
 			});
-		}
 
 		await sendTokens(c, user.id);
 
@@ -59,6 +66,39 @@ const authRoutes = new Hono()
 			},
 			200
 		);
+	})
+
+	.post('/verify', async c => {
+		try {
+			const cookies = await getSignedCookie(c, env.COOKIE_SECRET);
+			const access_token = cookies.access_token;
+			const refresh_token = cookies.refresh_token;
+
+			if (!access_token || !refresh_token)
+				throw new HTTPException(401, {
+					message: 'Unauthorized! Please login to continue.',
+				});
+
+			const payload = (await verify(
+				access_token,
+				env.ACCESS_TOKEN_SECRET
+			)) as MyJWTPayload;
+
+			return c.json({ userId: payload.userId });
+		} catch (error) {
+			throw new HTTPException(401, {
+				message: 'Invalid token',
+			});
+		}
+	})
+
+	.post('/logout', async c => {
+		deleteCookie(c, 'access_token', { path: '/api/v1' });
+		deleteCookie(c, 'refresh_token', { path: '/api/v1' });
+		return c.json({
+			success: true,
+			message: 'Logout successful',
+		});
 	});
 
 export default authRoutes;

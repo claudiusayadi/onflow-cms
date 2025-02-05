@@ -1,26 +1,19 @@
-# Use the official Node.js LTS Alpine image as the base
-FROM node:lts-alpine
+FROM node:22-alpine
 
-# Set up PNPM with caching capability
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# Install pnpm explicitly
+RUN npm install -g pnpm@latest
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /usr/src/app
 
-# Create store directory and set permissions
-RUN mkdir -p /pnpm/store && \
-	chown -R node:node /pnpm/store /usr/src/app
-
-# Switch to non-root user
-USER node
-
-# Copy package.json and pnpm-lock.yaml (if available)
-COPY --chown=node:node package.json pnpm-lock.yaml* ./
+# Copy package.json and pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
-RUN pnpm install
+RUN pnpm install --frozen-lockfile --prod
+
+# Copy the rest of the application code
+COPY . .
 
 # Start the application
 CMD ["pnpm", "dev"]

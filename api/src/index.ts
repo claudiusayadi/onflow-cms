@@ -9,29 +9,16 @@ import onError from './on-error';
 import authRoutes from './routes/auth';
 
 const app = new Hono();
-
 app.use(logger());
 app.use(
 	'*',
 	cors({
-		origin: '*', // TODO: Change this to onflow-cms.dovely.tech
+		origin: '*', // TODO: Change this to onflow-cms.dovely.tech in production
 		credentials: true,
 	})
 );
 
 app.basePath('/api/v1').route('/auth', authRoutes);
-
-// .post(
-// 	'/auth/logout',
-// 	handler(async c => {
-// 		await deleteCookie(c, 'access_token', { path: '/api/v1' });
-// 		await deleteCookie(c, 'refresh_token', { path: '/api/v1' });
-// 		return c.json({
-// 			success: true,
-// 			message: 'Logout successful',
-// 		});
-// 	})
-// );
 
 // Global error handler
 app.notFound(c => {

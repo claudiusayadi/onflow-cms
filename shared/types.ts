@@ -20,10 +20,14 @@ export const userSchema = usersInsertSchema
 		password: z
 			.string()
 			.min(8, { message: 'Password must be at least 8 characters' })
-			.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-				message: 'Password must contain uppercase, lowercase, and number',
-			}),
-		role: z.enum(['reader', 'writer', 'editor', 'admin']),
+			.regex(
+				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&*()\\_+!~`\-={}|[\]:";'<>?,./]).+$/,
+				{
+					message:
+						'Password must contain at least one uppercase, one lowercase, one number, and one special character',
+				}
+			),
+		role: z.enum(['reader', 'writer', 'editor', 'admin']).default('reader'),
 	});
 
 export const profileSchema = profileInsertSchema.omit({

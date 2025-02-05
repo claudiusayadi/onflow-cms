@@ -1,0 +1,17 @@
+name: onflow-cms
+services:
+  api:
+    container_name: onflow-cms-api
+    build: ./api
+    environment:
+      TZ: Africa/Lagos
+    ports:
+      - 4000:3000
+    volumes:
+      - ./api:/usr/src/app
+    networks:
+      - onflow
+
+networks:
+  onflow:
+    driver: bridge

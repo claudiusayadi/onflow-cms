@@ -7,8 +7,8 @@ import { relations } from 'drizzle-orm';
 export const comments = pgTable('comments', {
 	id: varchar('id').primaryKey(),
 	userId: varchar('user_id').references(() => users.id),
-	content: text('content').notNull(),
 	postId: varchar('post_id').notNull(),
+	content: text('content').notNull(),
 	createdAt: timestamp('created_at').defaultNow(),
 	updatedAt: timestamp('updated_at').defaultNow(),
 });

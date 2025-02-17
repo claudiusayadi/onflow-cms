@@ -45,8 +45,7 @@ function Post({ post }: { post: IPost }) {
 							alt={post.title}
 							width={384}
 							height={384}
-							className='size-full'
-							layout='cover'
+							className='size-full object-cover'
 						/>
 					</picture>
 				</CardHead>

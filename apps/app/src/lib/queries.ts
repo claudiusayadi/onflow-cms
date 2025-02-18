@@ -17,8 +17,8 @@ export const GET_POSTS = gql`
 `;
 
 export const GET_POST_BY_ID = gql`
-	query getPostById($id: String) {
-		getPostById(id:$id) {
+	query getPostById($id: String!) {
+		getPostById(id: $id) {
 			id
 			title
 			content
@@ -27,11 +27,32 @@ export const GET_POST_BY_ID = gql`
 			createdAt
 			updatedAt
 			author {
-			name
+				name
 			}
-			tags: {
+			tags {
+				id
+				name
+			}
+		}
+	}
+`;
+
+export const GET_POST_BY_SLUG = gql`
+	query GetPostBySlug($slug: String!) {
+		getPostBySlug(slug: $slug) {
 			id
-			name
+			title
+			content
+			thumbnail
+			published
+			createdAt
+			updatedAt
+			author {
+				name
+			}
+			tags {
+				id
+				name
 			}
 		}
 	}

@@ -66,13 +66,13 @@ function Pagination({
 		<div className={cn('flex justify-center items-center gap-2', className)}>
 			{currentPage > 1 && (
 				<NavigationButton href={`?page=${currentPage - 1}`}>
-					<ChevronLeft size={20} />
+					<ChevronLeft />
 				</NavigationButton>
 			)}
 
 			{pageNumbers.map(page =>
 				page === '...' ? (
-					<span key={page} className='px-2'>
+					<span key={page} className='p-2'>
 						{page}
 					</span>
 				) : (
@@ -87,7 +87,7 @@ function Pagination({
 
 			{currentPage < totalPages && (
 				<NavigationButton href={`?page=${currentPage + 1}`}>
-					<ChevronRight size={20} />
+					<ChevronRight />
 				</NavigationButton>
 			)}
 		</div>

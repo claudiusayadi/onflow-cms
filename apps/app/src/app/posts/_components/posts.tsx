@@ -1,5 +1,5 @@
-import { IPost } from '../lib/types/models';
-import Pagination from './pagination';
+import { IPost } from '@/lib/types/models';
+import Pagination from '@/components/pagination';
 import Post from './post';
 
 function Posts({

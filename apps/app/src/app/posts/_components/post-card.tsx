@@ -3,6 +3,8 @@ import { IPost } from '@/lib/types/models';
 import { Card, CardBody, CardHead } from '@/components/card';
 import { Badge } from '@/components/badge';
 import Link from 'next/link';
+import SanitizedContent from './sanitized-content';
+import { cn } from '@/lib/utils';
 
 function Post({ post }: { post: IPost }) {
 	return (
@@ -12,9 +14,10 @@ function Post({ post }: { post: IPost }) {
 					<h3 className='mt-4 font-semibold text-gray-800 text-lg'>
 						{post.title}
 					</h3>
-					<p className='mt-2 text-gray-600 break-words'>
-						{post.content.slice(0, 200)}...
-					</p>
+					<SanitizedContent
+						content={post.content.split(' ').slice(0, 30).join(' ') + '...'}
+						className={cn('mt-2 text-gray-600 break-words', '[&_h2]:hidden')}
+					/>
 
 					<div className='flex justify-between gap-2 mt-auto'>
 						<Badge variant='info' className='px-3'>

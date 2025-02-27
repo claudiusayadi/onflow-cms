@@ -1,4 +1,4 @@
-import Posts from './_components/posts';
+import Posts from './_components/archive';
 import { getPosts } from '../../lib/actions/posts';
 import { DEFAULT_PAGE_SIZE } from '../../lib/constants';
 

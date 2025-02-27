@@ -57,3 +57,12 @@ export const GET_POST_BY_SLUG = gql`
 		}
 	}
 `;
+
+export const SIGN_UP = gql`
+	mutation createUser($input: createUserInput!) {
+		createUser(createUserInput: $input) {
+			id
+			name
+		}
+	}
+`;

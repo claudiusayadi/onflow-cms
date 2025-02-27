@@ -1,13 +1,13 @@
-export type SignupFormState =
+export type FormState =
 	| {
+			message?: string;
 			data: {
 				email?: string;
 				password?: string;
 			};
-			errors: {
+			errors?: {
 				email?: string[];
 				password?: string[];
 			};
-			message?: string;
 	  }
 	| undefined;

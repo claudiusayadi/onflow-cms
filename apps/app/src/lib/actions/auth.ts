@@ -1,18 +1,24 @@
 'use server';
+
 import { fetcher } from '../fetcher';
 import { formSchema } from '../schema/form';
-import { print } from 'graphql';
-import { SIGN_UP } from '../queries';
-import { SignupFormState } from '../types/form-state';
+import { print, DocumentNode } from 'graphql';
+import { SIGN_IN, SIGN_UP } from '../queries';
+import { FormState } from '../types/form-state';
 import { redirect } from 'next/navigation';
 
-export async function signup(
-	state: SignupFormState,
-	formData: FormData
-): Promise<SignupFormState> {
-	const validateForm = formSchema.safeParse(
-		Object.fromEntries(formData.entries())
-	);
+async function action(
+	state: FormState,
+	formData: FormData,
+	query: DocumentNode,
+	responseField: string,
+	url: string
+): Promise<FormState> {
+	const validateForm = formSchema.safeParse({
+		email: formData.get('email'),
+		password: formData.get('password'),
+	});
+
 	if (!validateForm.success) {
 		return {
 			data: Object.fromEntries(formData.entries()),
@@ -20,15 +26,48 @@ export async function signup(
 		};
 	}
 
-	const data = await fetcher(print(SIGN_UP), {
-		input: { ...validateForm.data },
-	});
+	try {
+		const data = await fetcher(print(query), {
+			input: { ...validateForm.data },
+		});
 
-	if (data?.errors)
+		if (data.errors) {
+			return {
+				data: Object.fromEntries(formData.entries()),
+				message: `Operation failed! No ${responseField} in response.`,
+			};
+		}
+
+		redirect(url);
+	} catch (error) {
+		if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+			throw error;
+		}
+
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		console.error(
+			'Action error:',
+			errorMessage,
+			error instanceof Error ? error.stack : ''
+		);
+
 		return {
 			data: Object.fromEntries(formData.entries()),
-			message: 'Something went wrong!',
-			errors: {},
+			message: `${errorMessage}`,
 		};
-	redirect('/auth/signin');
+	}
+}
+
+export async function signup(
+	state: FormState,
+	formData: FormData
+): Promise<FormState> {
+	return action(state, formData, SIGN_UP, 'signup', '/auth/signin');
+}
+
+export async function signin(
+	state: FormState,
+	formData: FormData
+): Promise<FormState> {
+	return action(state, formData, SIGN_IN, 'signin', '/');
 }

@@ -59,10 +59,20 @@ export const GET_POST_BY_SLUG = gql`
 `;
 
 export const SIGN_UP = gql`
-	mutation createUser($input: createUserInput!) {
-		createUser(createUserInput: $input) {
+	mutation signup($input: CreateUserInput!) {
+		signup(createUserInput: $input) {
 			id
-			name
+			email
+		}
+	}
+`;
+
+export const SIGN_IN = gql`
+	mutation signin($input: SignInInput!) {
+		signin(signInInput: $input) {
+			id
+
+			accessToken
 		}
 	}
 `;

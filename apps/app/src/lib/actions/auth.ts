@@ -2,17 +2,16 @@
 
 import { fetcher } from '../fetcher';
 import { formSchema } from '../schema/form';
-import { print, DocumentNode } from 'graphql';
-import { SIGN_IN, SIGN_UP } from '../queries';
+import { print } from 'graphql';
+import { SIGN_UP, SIGN_IN } from '../queries';
 import { FormState } from '../types/form-state';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { createSession } from '../session';
 
-async function action(
+export async function signup(
 	state: FormState,
-	formData: FormData,
-	query: DocumentNode,
-	responseField: string,
-	url: string
+	formData: FormData
 ): Promise<FormState> {
 	const validateForm = formSchema.safeParse({
 		email: formData.get('email'),
@@ -27,47 +26,79 @@ async function action(
 	}
 
 	try {
-		const data = await fetcher(print(query), {
+		const data = await fetcher(print(SIGN_UP), {
 			input: { ...validateForm.data },
 		});
 
-		if (data.errors) {
+		if (!data || !data.signup) {
 			return {
 				data: Object.fromEntries(formData.entries()),
-				message: `Operation failed! No ${responseField} in response.`,
+				message: 'Signup failed: Something went wrong.',
 			};
 		}
 
-		redirect(url);
+		redirect('/auth/signin');
 	} catch (error) {
 		if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
 			throw error;
 		}
 
-		const errorMessage = error instanceof Error ? error.message : String(error);
-		console.error(
-			'Action error:',
-			errorMessage,
-			error instanceof Error ? error.stack : ''
-		);
-
+		console.error('Signup error:', error);
 		return {
 			data: Object.fromEntries(formData.entries()),
-			message: `${errorMessage}`,
+			message: error instanceof Error ? error.message : String(error),
 		};
 	}
-}
-
-export async function signup(
-	state: FormState,
-	formData: FormData
-): Promise<FormState> {
-	return action(state, formData, SIGN_UP, 'signup', '/auth/signin');
 }
 
 export async function signin(
 	state: FormState,
 	formData: FormData
 ): Promise<FormState> {
-	return action(state, formData, SIGN_IN, 'signin', '/');
+	const validateForm = formSchema.safeParse({
+		email: formData.get('email'),
+		password: formData.get('password'),
+	});
+
+	if (!validateForm.success) {
+		return {
+			data: Object.fromEntries(formData.entries()),
+			errors: validateForm.error.flatten().fieldErrors,
+		};
+	}
+
+	try {
+		const data = await fetcher(print(SIGN_IN), {
+			input: { ...validateForm.data },
+		});
+
+		if (!data || !data.signin) {
+			return {
+				data: Object.fromEntries(formData.entries()),
+				message: 'Signin failed: Something went wrong.',
+			};
+		}
+
+		await createSession({
+			user: {
+				id: data.signin.id,
+				name: data.signin.name,
+				avatar: data.signin.avatar,
+			},
+			accessToken: data.signin.accessToken,
+		});
+
+		revalidatePath('/');
+		redirect('/');
+	} catch (error) {
+		if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+			throw error;
+		}
+
+		console.error('Signin error:', error);
+		return {
+			data: Object.fromEntries(formData.entries()),
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
 }

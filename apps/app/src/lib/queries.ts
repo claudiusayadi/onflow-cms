@@ -71,7 +71,8 @@ export const SIGN_IN = gql`
 	mutation signin($input: SignInInput!) {
 		signin(signInInput: $input) {
 			id
-
+			name
+			avatar
 			accessToken
 		}
 	}

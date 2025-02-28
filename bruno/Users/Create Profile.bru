@@ -1,0 +1,20 @@
+meta {
+  name: Create Profile
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{host}}/users/profile
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Claudius",
+    "lastName": "A.",
+    "about": "Simple, addicted coder",
+    "userId": 1
+  }
+}

@@ -1,0 +1,30 @@
+{
+	"name": "onflow-cms-api",
+	"scripts": {
+		"dev": "tsx watch --env-file=.env src/index.ts",
+		"build": "tsx build src/index.ts",
+		"start": "tsx start src/index.ts",
+		"drizzle": "pnpm drizzle-kit generate && pnpm drizzle-kit migrate",
+		"studio": "pnpm drizzle-kit studio",
+		"drop": "pnpm tsx --env-file=.env seeds/drop.ts"
+	},
+	"dependencies": {
+		"@hono/node-server": "^1.13.8",
+		"@hono/zod-validator": "^0.4.2",
+		"@node-rs/argon2": "^2.0.2",
+		"drizzle-orm": "^0.39.1",
+		"drizzle-zod": "^0.7.0",
+		"hono": "^4.6.20",
+		"nanoid": "^5.0.9",
+		"pg": "^8.13.1",
+		"redis": "^4.7.0",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@types/node": "^20.17.17",
+		"@types/pg": "^8.11.11",
+		"dotenv": "^16.4.7",
+		"drizzle-kit": "^0.30.4",
+		"tsx": "^4.19.2"
+	}
+}

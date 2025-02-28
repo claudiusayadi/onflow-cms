@@ -1,0 +1,19 @@
+meta {
+  name: Create Posts
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/posts
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Post 1",
+    "content": "Hello from Post 1",
+    "authorId": 1
+  }
+}

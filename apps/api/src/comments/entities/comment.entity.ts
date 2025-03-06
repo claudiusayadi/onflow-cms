@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Post } from '../../posts/entities/post.entity';
 import { User } from '../../users/entities/user.entity';
+import { Post } from '../../posts/entities/post.entity';
 
 @ObjectType()
 export class Comment {
@@ -10,11 +10,17 @@ export class Comment {
   @Field()
   content: string;
 
-  @Field(() => Post)
-  post: Post;
+  @Field()
+  authorId: string;
+
+  @Field()
+  postId: string;
 
   @Field(() => User)
   author: User;
+
+  @Field(() => Post)
+  post: Post;
 
   @Field()
   createdAt: Date;

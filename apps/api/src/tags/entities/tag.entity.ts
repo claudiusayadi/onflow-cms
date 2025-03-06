@@ -9,6 +9,27 @@ export class Tag {
   @Field()
   name: string;
 
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field()
+  slug: string;
+
+  @Field({ nullable: true })
+  thumbnail?: string;
+
+  @Field({ nullable: true })
+  icon?: string;
+
+  @Field({ nullable: true })
+  color?: string;
+
+  @Field()
+  createdAt: Date;
+
+  @Field()
+  updatedAt: Date;
+
   @Field(() => [Post], { nullable: true })
-  posts: Post[];
+  posts?: Post[];
 }

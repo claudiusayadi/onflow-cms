@@ -1,7 +1,8 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Role } from '../../enums';
 import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
-import { Role } from '@prisma/client';
+import { Like } from '../../likes/entities/like.entity';
 
 @ObjectType()
 export class User {
@@ -12,10 +13,10 @@ export class User {
   email: string;
 
   @Field()
-  name: string;
+  password: string;
 
   @Field()
-  password: string;
+  name: string;
 
   @Field({ nullable: true })
   bio?: string;
@@ -23,7 +24,7 @@ export class User {
   @Field({ nullable: true })
   avatar?: string;
 
-  @Field({ defaultValue: Role.reader })
+  @Field(() => Role)
   role: Role;
 
   @Field()
@@ -37,4 +38,7 @@ export class User {
 
   @Field(() => [Comment], { nullable: true })
   comments?: Comment[];
+
+  @Field(() => [Like], { nullable: true })
+  likes?: Like[];
 }

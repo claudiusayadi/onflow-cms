@@ -12,11 +12,21 @@ type AuthPayload {
 
 type Comment {
   author: User!
+  authorId: String!
   content: String!
   createdAt: DateTime!
   id: ID!
   post: Post!
+  postId: String!
   updatedAt: DateTime!
+}
+
+input CreatePostInput {
+  authorId: String!
+  content: String!
+  published: Status! = draft
+  thumbnail: String
+  title: String!
 }
 
 input CreateUserInput {
@@ -25,7 +35,7 @@ input CreateUserInput {
   email: String!
   name: String!
   password: String!
-  role: String
+  role: Role! = reader
 }
 
 """
@@ -37,10 +47,13 @@ type Like {
   createdAt: DateTime!
   id: ID!
   post: Post!
+  postId: String!
   user: User!
+  userId: String!
 }
 
 type Mutation {
+  createPost(input: CreatePostInput!): Post!
   signin(signInInput: SignInInput!): AuthPayload!
   signup(createUserInput: CreateUserInput!): User!
 }
@@ -61,18 +74,42 @@ type Post {
   updatedAt: DateTime!
 }
 
+type PostsResponse {
+  currentPage: Int!
+  pages: Int!
+  posts: [Post!]!
+  total: Int!
+}
+
 type Query {
-  getPostById(id: String!): Post!
-  getPostBySlug(slug: String!): Post!
+  getDashboardPosts(limit: Int! = 12, page: Int! = 1, sortField: SortField, sortOrder: SortOrder): PostsResponse!
+  getPublishedPosts(limit: Int! = 12, page: Int! = 1, sortField: SortField, sortOrder: SortOrder): PostsResponse!
+  getTrashPosts(limit: Int! = 12, page: Int! = 1, sortField: SortField, sortOrder: SortOrder): PostsResponse!
   postComments(postId: String!, skip: Int = 0, take: Int = 12): [Comment!]!
   postCommentsCount(postId: String!): Int!
-  postCount: Int!
-  posts(skip: Int = 0, take: Int = 12): [Post!]!
+}
+
+enum Role {
+  admin
+  editor
+  reader
+  writer
 }
 
 input SignInInput {
   email: String!
   password: String!
+}
+
+enum SortField {
+  createdAt
+  title
+  updatedAt
+}
+
+enum SortOrder {
+  asc
+  desc
 }
 
 enum Status {
@@ -82,9 +119,16 @@ enum Status {
 }
 
 type Tag {
+  color: String
+  createdAt: DateTime!
+  description: String
+  icon: String
   id: ID!
   name: String!
   posts: [Post!]
+  slug: String!
+  thumbnail: String
+  updatedAt: DateTime!
 }
 
 type User {
@@ -94,9 +138,10 @@ type User {
   createdAt: DateTime!
   email: String!
   id: ID!
+  likes: [Like!]
   name: String!
   password: String!
   posts: [Post!]
-  role: String!
+  role: Role!
   updatedAt: DateTime!
 }

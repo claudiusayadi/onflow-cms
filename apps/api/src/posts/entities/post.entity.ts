@@ -1,8 +1,9 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Status } from '../../enums';
 import { User } from '../../users/entities/user.entity';
-import { Like } from '../../likes/entities/like.entity';
-import { Tag } from '../../tags/entities/tag.entity';
 import { Comment } from '../../comments/entities/comment.entity';
+import { Tag } from '../../tags/entities/tag.entity';
+import { Like } from '../../likes/entities/like.entity';
 
 @ObjectType()
 export class Post {
@@ -15,14 +16,20 @@ export class Post {
   @Field()
   content: string;
 
-  @Field({ nullable: true })
+  @Field()
   slug: string;
 
   @Field({ nullable: true })
-  thumbnail: string;
+  thumbnail?: string;
 
-  @Field(() => Boolean)
-  published: boolean;
+  @Field(() => Status)
+  published: Status;
+
+  @Field()
+  authorId: string;
+
+  @Field(() => User)
+  author: User;
 
   @Field()
   createdAt: Date;
@@ -30,15 +37,12 @@ export class Post {
   @Field()
   updatedAt: Date;
 
-  @Field(() => User)
-  author: User;
-
   @Field(() => [Comment], { nullable: true })
-  comments: Comment[];
-
-  @Field(() => [Like], { nullable: true })
-  likes: Like[];
+  comments?: Comment[];
 
   @Field(() => [Tag], { nullable: true })
-  tags: Tag[];
+  tags?: Tag[];
+
+  @Field(() => [Like], { nullable: true })
+  likes?: Like[];
 }

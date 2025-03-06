@@ -12,7 +12,7 @@ export class PostsService {
 
   async createPost(post: CreatePostInput) {
     const slug = slugify(post.title);
-    return this.prisma.post.create({
+    return await this.prisma.post.create({
       data: {
         ...post,
         slug,
@@ -33,14 +33,14 @@ export class PostsService {
       : { createdAt: Prisma.SortOrder.desc };
 
     const [posts, total] = await Promise.all([
-      this.prisma.post.findMany({
+      await this.prisma.post.findMany({
         where: { published: { in: statuses } },
         skip,
         take: limit,
         orderBy,
         include: { author: true, tags: true, comments: true, likes: true },
       }),
-      this.prisma.post.count({ where: { published: { in: statuses } } }),
+      await this.prisma.post.count({ where: { published: { in: statuses } } }),
     ]);
 
     return {
@@ -51,14 +51,14 @@ export class PostsService {
     };
   }
   async getPublishedPosts(args: GetPostsArgs) {
-    return this.getPostsByStatus(args, [Status.published]);
+    return await this.getPostsByStatus(args, [Status.published]);
   }
 
   async getDashboardPosts(args: GetPostsArgs) {
-    return this.getPostsByStatus(args, [Status.published, Status.draft]);
+    return await this.getPostsByStatus(args, [Status.published, Status.draft]);
   }
 
   async getTrashPosts(args: GetPostsArgs) {
-    return this.getPostsByStatus(args, [Status.deleted]);
+    return await this.getPostsByStatus(args, [Status.deleted]);
   }
 }

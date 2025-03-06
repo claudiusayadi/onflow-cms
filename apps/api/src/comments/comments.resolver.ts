@@ -1,7 +1,7 @@
 import { Args, Int, Query, Resolver } from '@nestjs/graphql';
 import { CommentsService } from './comments.service';
 import { Comment } from './entities/comment.entity';
-import { DEFAULT_PAGE_SIZE } from '../constants';
+import { DEFAULT_LIMIT } from '../constants';
 
 @Resolver(() => Comment)
 export class CommentsResolver {
@@ -15,7 +15,7 @@ export class CommentsResolver {
     @Args('take', {
       type: () => Int,
       nullable: true,
-      defaultValue: DEFAULT_PAGE_SIZE,
+      defaultValue: DEFAULT_LIMIT,
     })
     take: number,
   ) {

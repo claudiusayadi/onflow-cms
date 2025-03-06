@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { DEFAULT_PAGE_SIZE } from 'src/constants';
+import { DEFAULT_LIMIT } from 'src/constants';
 
 @Injectable()
 export class CommentsService {
@@ -9,7 +9,7 @@ export class CommentsService {
   async getPostComments(
     postId: string,
     skip: number = 0,
-    take: number = DEFAULT_PAGE_SIZE,
+    take: number = DEFAULT_LIMIT,
   ) {
     return await this.prisma.comment.findMany({
       where: {

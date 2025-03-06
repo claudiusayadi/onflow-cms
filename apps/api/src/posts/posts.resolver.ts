@@ -11,21 +11,21 @@ export class PostsResolver {
 
   @Mutation(() => Post)
   async createPost(@Args('input') input: CreatePostInput) {
-    return this.postsService.createPost(input);
+    return await this.postsService.createPost(input);
   }
 
   @Query(() => PostsResponse)
   async getPublishedPosts(@Args() args: GetPostsArgs) {
-    return this.postsService.getPublishedPosts(args);
+    return await this.postsService.getPublishedPosts(args);
   }
 
   @Query(() => PostsResponse)
   async getDashboardPosts(@Args() args: GetPostsArgs) {
-    return this.postsService.getDashboardPosts(args);
+    return await this.postsService.getDashboardPosts(args);
   }
 
   @Query(() => PostsResponse)
   async getTrashPosts(@Args() args: GetPostsArgs) {
-    return this.postsService.getTrashPosts(args);
+    return await this.postsService.getTrashPosts(args);
   }
 }

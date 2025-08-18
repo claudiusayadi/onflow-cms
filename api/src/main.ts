@@ -1,11 +1,10 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { IPackageJson } from 'src/common/interfaces/pkg.interface';
 import { ApiConfig } from 'src/config/env.validation';
-import pkg from '../package.json';
+import * as pkg from '../package.json';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -14,34 +13,34 @@ async function bootstrap() {
   const prefix = ApiConfig.API_BASEPATH;
   const port = ApiConfig.API_PORT;
   const env = ApiConfig.NODE_ENV;
-  const p = pkg as IPackageJson;
-  const title: string = p?.name?.replace(/-/g, ' ').toUpperCase() ?? '';
+  const title: string = pkg?.name?.replace(/-/g, ' ').toUpperCase() ?? '';
 
   app.use(helmet());
   app.enableCors({ origin: true, credentials: true });
-  app.use(cookieParser);
+  app.use(cookieParser());
   app.setGlobalPrefix(prefix);
 
   const config = new DocumentBuilder()
     .setTitle(title)
-    .setDescription(p?.description ?? '')
-    .addBearerAuth()
-    .addSecurityRequirements('bearer')
-    .setVersion(p?.version ?? '1.0.0')
+    .setDescription(pkg.description)
+    .addCookieAuth('')
+    .setVersion(pkg.version)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(`${prefix}/docs`, app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
+  SwaggerModule.setup('docs', app, document, {
+    useGlobalPrefix: true,
+    customSiteTitle: title,
   });
 
   await app.listen(port ?? 3000);
   logger.log(
     `📚 Swagger documentation available at http://localhost:${port}/${prefix}/docs`,
   );
-  logger.log(`🚀 Application is running on: http://localhost:${port}`);
+  logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${prefix}`,
+  );
   logger.log(`🌍 Environment: ${env}`);
 }
-bootstrap();
+
+void bootstrap();

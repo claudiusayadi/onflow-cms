@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -50,7 +51,11 @@ export class AuthService {
   }
 
   async signup(dto: AuthDto) {
-    const user = this.usersRepo.create(dto);
+    const { email, password } = dto;
+    const existing = await this.usersRepo.findOneBy({ email });
+    if (existing) throw new ConflictException('Account already exists!');
+
+    const user = this.usersRepo.create({ email, password });
     return await this.usersRepo.save(user);
   }
 

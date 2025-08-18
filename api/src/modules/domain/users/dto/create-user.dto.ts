@@ -8,9 +8,6 @@ import {
 } from 'class-validator';
 import { UserRole } from '../enums/user-roles.enum';
 
-/**
- * Create user data
- */
 export class CreateUserDto {
   /**
    * User first name
@@ -28,6 +25,10 @@ export class CreateUserDto {
   @IsOptional()
   lastName?: string;
 
+  /**
+   * User email
+   * @example "gracefullground@smallbodybiggod.local"
+   */
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -39,7 +40,7 @@ export class CreateUserDto {
    * - at least one uppercase letter
    * - at least one number
    * - at least one symbol
-   * @example "password123"
+   * @example "YouandMe.Forever2025$"
    */
   @IsString()
   @IsNotEmpty()

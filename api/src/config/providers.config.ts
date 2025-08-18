@@ -1,8 +1,10 @@
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { AllExceptionsFilter } from 'src/common/filters/all-exceptions.filter';
 import { Traffic } from 'src/common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { VALIDATION_PIPE_OPTIONS } from 'src/common/util/common.constants';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/modules/auth/guards/roles.guard';
 
@@ -18,6 +20,10 @@ export const apiProviders = [
   {
     provide: APP_GUARD,
     useClass: RolesGuard,
+  },
+  {
+    provide: APP_PIPE,
+    useValue: new ValidationPipe(VALIDATION_PIPE_OPTIONS),
   },
   {
     provide: APP_FILTER,

@@ -9,7 +9,6 @@ export const envSchema = z.object({
     .enum(['development', 'production', 'test', 'staging'])
     .default('development'),
   API_PORT: z.coerce.number().min(1, 'API_PORT is required!'),
-  API_BASEPATH: z.string().min(1, 'API_BASEPATH is required!'),
 
   DB_URL: z.string().min(1, 'DB_URL is required!'),
 

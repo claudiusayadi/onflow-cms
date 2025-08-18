@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { seconds, ThrottlerModuleOptions } from '@nestjs/throttler';
-import { ApiConfig } from './env.validation';
+import { ApiConfig } from './app.config';
 
 export default registerAs('throttler', () => {
   const config = [

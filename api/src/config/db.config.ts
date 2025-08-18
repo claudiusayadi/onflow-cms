@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ApiConfig } from './env.validation';
+import { ApiConfig } from './app.config';
 
 export default registerAs('db', () => {
   const config = {

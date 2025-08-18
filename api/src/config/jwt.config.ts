@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { JwtModuleOptions } from '@nestjs/jwt';
-import { ApiConfig } from './env.validation';
+import { ApiConfig } from './app.config';
 
 export default registerAs('jwt', () => {
   const config = {

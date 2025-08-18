@@ -3,17 +3,18 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { ApiConfig } from 'src/config/env.validation';
+import { ApiConfig } from 'src/config/app.config';
 import * as pkg from '../package.json';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger(bootstrap.name);
-  const prefix = ApiConfig.API_BASEPATH;
   const port = ApiConfig.API_PORT;
   const env = ApiConfig.NODE_ENV;
   const title: string = pkg?.name?.replace(/-/g, ' ').toUpperCase() ?? '';
+  const versionMajor = pkg.version?.split('.')[0] ?? '1';
+  const prefix = `api/v${versionMajor}`;
 
   app.use(helmet());
   app.enableCors({ origin: true, credentials: true });

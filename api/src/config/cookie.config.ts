@@ -1,4 +1,4 @@
-import { ApiConfig } from './env.validation';
+import { ApiConfig } from './app.config';
 
 export default {
   secure: true,

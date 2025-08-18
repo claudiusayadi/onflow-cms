@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { ApiConfig } from './env.validation';
+import { ApiConfig } from './app.config';
 
 export default new DataSource({
   type: 'postgres',

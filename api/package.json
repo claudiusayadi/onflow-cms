@@ -1,10 +1,41 @@
 {
-  "name": "api",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "name": "onflow-cms-api",
+  "version": "2.0.0",
+  "description": "OnFlowCMS API - A modern content management system backend built with NestJS, TypeORM, and PostgreSQL",
+  "author": {
+    "name": "Claudius A.",
+    "email": "ayadiclaudius@gmail.com",
+    "url": "https://github.com/claudiusayadi"
+  },
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "homepage": "https://github.com/claudiusayadi/onflow-cms#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/claudiusayadi/onflow-cms.git",
+    "directory": "api"
+  },
+  "bugs": {
+    "url": "https://github.com/claudiusayadi/onflow-cms/issues"
+  },
+  "keywords": [
+    "cms",
+    "content-management",
+    "nestjs",
+    "typescript",
+    "typeorm",
+    "postgresql",
+    "api",
+    "rest",
+    "swagger",
+    "jwt",
+    "authentication",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

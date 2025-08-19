@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -28,13 +28,12 @@ import { AuthDto } from './dto/auth.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
-@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: 'Sign up user' })
-  @ApiOkResponse({ description: 'User registered successfully' })
+  @ApiCreatedResponse({ description: 'User registered successfully' })
   @ApiConflictResponse({ description: 'Account already exists' })
   @Public()
   @Post('signup')

@@ -10,6 +10,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import {
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { IdDto } from 'src/common/dtos/id.dto';
 import { RemoveDto } from 'src/common/dtos/remove.dto';
 import { CurrentUser } from 'src/modules/auth/decorators/current-user.decorator';
@@ -20,61 +28,63 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRole } from './enums/user-roles.enum';
 import { UsersService } from './users.service';
 
-@Controller('accounts')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  /**
-   * Create a new user account (Admin only)
-   * @example {firstName: "John", lastName: "Doe", email: "john@doe.com", password: "password123", avatar: "avatar.jpg", bio: "I love Arsenal FC!"}
-   */
+  @ApiOperation({ summary: 'Create a new user account (Admin only)' })
+  @ApiCreatedResponse({ description: 'User account created successfully' })
+  @ApiConflictResponse({ description: 'User with this email already exists' })
+  @ApiUnauthorizedResponse({ description: 'Admin access required' })
   @Post()
   @Roles(UserRole.ADMIN)
   async create(@Body() dto: CreateUserDto) {
     return await this.usersService.create(dto);
   }
 
-  /**
-   * Get all user accounts (Admin only)
-   */
+  @ApiOperation({ summary: 'Get all user accounts (Admin only)' })
+  @ApiOkResponse({
+    description: 'List of all user accounts retrieved successfully',
+  })
+  @ApiUnauthorizedResponse({ description: 'Admin access required' })
   @Get()
   @Roles(UserRole.ADMIN)
   async findAll() {
     return this.usersService.findAll();
   }
 
-  /**
-   * Get user account (Owner only)
-   * @example {id: "1"}
-   */
+  @ApiOperation({ summary: 'Get current user profile (Owner only)' })
+  @ApiOkResponse({ description: 'User profile retrieved successfully' })
+  @ApiUnauthorizedResponse({ description: 'Authentication required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   @Get('me')
   async getProfile(@CurrentUser() user: IRequestUser) {
     return await this.usersService.findOne(user.id);
   }
 
-  /**
-   * Get user account (Admin only)
-   * @example {id: "1"}
-   */
+  @ApiOperation({ summary: 'Get user account by ID (Admin only)' })
+  @ApiOkResponse({ description: 'User account retrieved successfully' })
+  @ApiUnauthorizedResponse({ description: 'Admin access required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   @Roles(UserRole.ADMIN)
   @Get(':id')
   async getProfileById(@Param('id') { id }: IdDto) {
     return await this.usersService.findOne(id);
   }
 
-  /**
-   * Update user account (Owner only)
-   * @example {firstName: "John", lastName: "Doe", email: "john@doe.com", avatar: "avatar.jpg", bio: "I love loser FC now - Man U!"}
-   */
+  @ApiOperation({ summary: 'Update current user profile (Owner only)' })
+  @ApiOkResponse({ description: 'User profile updated successfully' })
+  @ApiUnauthorizedResponse({ description: 'Authentication required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   @Patch('me')
   updateProfile(@CurrentUser() user: IRequestUser, @Body() dto: UpdateUserDto) {
     return this.usersService.update(user.id, dto);
   }
 
-  /**
-   * Update user account (Admin only)
-   * @example {firstName: "John", lastName: "Doe", email: "john@doe.com", avatar: "avatar.jpg", bio: "I love loser FC now - Man U!"}
-   */
+  @ApiOperation({ summary: 'Update user account by ID (Admin only)' })
+  @ApiOkResponse({ description: 'User account updated successfully' })
+  @ApiUnauthorizedResponse({ description: 'Admin access required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   @HttpCode(HttpStatus.OK)
   @Patch(':id')
   @Roles(UserRole.ADMIN)
@@ -82,19 +92,27 @@ export class UsersController {
     return this.usersService.update(id, dto);
   }
 
-  /**
-   * Deactivate/Delete user account (Owner only)
-   * @example {soft: true}
-   */
+  @ApiOperation({
+    summary: 'Deactivate/Delete current user account (Owner only)',
+  })
+  @ApiOkResponse({
+    description: 'User account deactivated/deleted successfully',
+  })
+  @ApiUnauthorizedResponse({ description: 'Authentication required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   @Delete('me')
   deactivate(@CurrentUser() user: IRequestUser, @Query() { soft }: RemoveDto) {
     return this.usersService.remove(user.id, soft ?? false);
   }
 
-  /**
-   * Deactivate/Delete user account (Admin only)
-   * @example {soft: true}
-   */
+  @ApiOperation({
+    summary: 'Deactivate/Delete user account by ID (Admin only)',
+  })
+  @ApiOkResponse({
+    description: 'User account deactivated/deleted successfully',
+  })
+  @ApiUnauthorizedResponse({ description: 'Admin access required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   remove(@Param('id') { id }: IdDto, @Query() { soft }: RemoveDto) {

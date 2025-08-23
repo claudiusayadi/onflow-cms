@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { ApiConfig } from 'src/config/app.config';
+import tokensConfig from 'src/config/tokens.config';
 import * as pkg from '../package.json';
 import { AppModule } from './app.module';
 
@@ -24,7 +25,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle(title)
     .setDescription(pkg.description)
-    .addCookieAuth('')
+    .addCookieAuth(tokensConfig.access)
+    .addCookieAuth(tokensConfig.refresh)
     .setVersion(pkg.version)
     .build();
 

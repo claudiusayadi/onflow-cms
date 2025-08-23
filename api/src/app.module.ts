@@ -7,6 +7,10 @@ import throttlerConfig from 'src/config/throttler.config';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { DbModule } from 'src/modules/db/db.module';
 import { UsersModule } from 'src/modules/domain/users/users.module';
+import { RedisModule } from 'src/modules/redis/redis.module';
+import { CommentsModule } from './modules/domain/comments/comments.module';
+import { PostsModule } from './modules/domain/posts/posts.module';
+import { TagsModule } from './modules/domain/tags/tags.module';
 
 @Module({
   imports: [
@@ -19,6 +23,10 @@ import { UsersModule } from 'src/modules/domain/users/users.module';
     AuthModule,
     DbModule,
     UsersModule,
+    RedisModule,
+    PostsModule,
+    TagsModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [...apiProviders],

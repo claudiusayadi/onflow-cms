@@ -5,10 +5,13 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { RegistryDates } from 'src/common/dtos/registry-dates.dto';
+import { RegistryDates } from 'src/common/dto/registry-dates.dto';
+import { Comment } from '../../comments/entities/comment.entity';
+import { Post } from '../../posts/entities/post.entity';
 import { UserRole } from '../enums/user-roles.enum';
 
 @Entity('users')
@@ -43,21 +46,11 @@ export class User {
   })
   role: UserRole;
 
-  // @Column({ name: 'password_changed_at', nullable: true })
-  // @Exclude()
-  // passwordChangedAt?: Date;
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
 
-  // @Column({ name: 'password_reset_token', nullable: true })
-  // @Exclude()
-  // passwordResetToken?: string;
-
-  // @Column({ name: 'password_reset_expires', nullable: true })
-  // @Exclude()
-  // passwordResetExpires?: Date;
-
-  // @Column({ default: true })
-  // @Exclude()
-  // isActive: boolean;
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 
   @Column(() => RegistryDates, { prefix: false })
   registryDates: RegistryDates;
@@ -75,16 +68,6 @@ export class User {
     if (!password) throw new Error('Password to compare is missing');
     return await argon.verify(this.password, password);
   }
-
-  // changedPasswordAfter(JWTTimestamp: number): boolean {
-  //   if (!this.passwordChangedAt) return false;
-
-  //   const changedTimestamp = parseInt(
-  //     (this.passwordChangedAt.getTime() / 1000).toString(),
-  //     10,
-  //   );
-  //   return JWTTimestamp < changedTimestamp;
-  // }
 
   get isDeleted() {
     return !!this.registryDates.deletedAt;

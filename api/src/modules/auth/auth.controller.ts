@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
+  ApiCookieAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -19,10 +20,12 @@ import {
 import { Response } from 'express';
 
 import cookieConfig from 'src/config/cookie.config';
+import tokensConfig from 'src/config/tokens.config';
+import { RefreshTokenDto } from 'src/modules/auth/dto/refresh-token.dto';
 import { IRequestUser } from 'src/modules/domain/users/interfaces/user.interface';
 import { jwtCookieHeader } from 'src/swagger/jwt-cookie-header';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './decorators/current-user.decorator';
+import { ActiveUser } from './decorators/active-user.decorator';
 import { Public } from './decorators/public.decorator';
 import { AuthDto } from './dto/auth.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -41,6 +44,7 @@ export class AuthController {
     return this.authService.signup(dto);
   }
 
+  @ApiCookieAuth()
   @ApiOperation({ summary: 'Sign in user' })
   @ApiOkResponse({
     description: 'User signed in successfully',
@@ -51,14 +55,41 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Public()
   @Post('signin')
-  signin(
+  async signin(
     @Body() dto: AuthDto,
-    @CurrentUser() user: IRequestUser,
+    @ActiveUser() user: IRequestUser,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = this.authService.signin(user);
-    res.cookie('jwt', token, cookieConfig);
+    const { accessToken, refreshToken } = await this.authService.signin(user);
+    res.cookie(tokensConfig.access, accessToken, cookieConfig.access);
+    res.cookie(tokensConfig.refresh, refreshToken, cookieConfig.refresh);
     return { message: 'Signed in successfully', user };
+  }
+
+  @ApiOperation({ summary: 'Refresh tokens' })
+  @ApiOkResponse({ description: 'Tokens refreshed successfully' })
+  @ApiUnauthorizedResponse({ description: 'Invalid refresh token' })
+  @Post('refresh')
+  async refresh(
+    @Body() { id, refreshToken }: RefreshTokenDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken: newRefreshToken } =
+      await this.authService.refreshTokens(id, refreshToken);
+    res.cookie(tokensConfig.access, accessToken, cookieConfig.access);
+    res.cookie(tokensConfig.refresh, newRefreshToken, cookieConfig.refresh);
+    return { message: 'Tokens refreshed successfully' };
+  }
+
+  @ApiOperation({ summary: 'Sign out user' })
+  @ApiOkResponse({ description: 'User signed out successfully' })
+  @HttpCode(HttpStatus.OK)
+  @Public()
+  @Post('signout')
+  signout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie(tokensConfig.access, cookieConfig.access);
+    res.clearCookie(tokensConfig.refresh, cookieConfig.refresh);
+    return { message: 'Signed out successfully' };
   }
 
   @ApiOperation({ summary: 'Change password' })
@@ -67,7 +98,7 @@ export class AuthController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @Patch('change-password')
   async changePassword(
-    @CurrentUser() user: IRequestUser,
+    @ActiveUser() user: IRequestUser,
     @Body() dto: ChangePasswordDto,
   ) {
     return this.authService.changePassword(user.id, dto);

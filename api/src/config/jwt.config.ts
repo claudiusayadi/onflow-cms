@@ -8,6 +8,11 @@ export default registerAs('jwt', () => {
     signOptions: {
       expiresIn: ApiConfig.JWT_TTL,
     },
-  } as const satisfies JwtModuleOptions;
+    refreshSecret: ApiConfig.JWT_REFRESH_SECRET,
+    refreshTtl: ApiConfig.JWT_REFRESH_TTL,
+  } as const satisfies JwtModuleOptions & {
+    refreshSecret: string;
+    refreshTtl: string | number;
+  };
   return config;
 });

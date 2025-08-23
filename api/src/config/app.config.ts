@@ -11,6 +11,8 @@ export const envSchema = z.object({
   API_PORT: z.coerce.number().min(1, 'API_PORT is required!'),
 
   DB_URL: z.string().min(1, 'DB_URL is required!'),
+  REDIS_HOST: z.string().optional(),
+  REDIS_PORT: z.coerce.number().optional(),
 
   JWT_SECRET: z.string().min(64, 'JWT_SECRET must be at least 64 characters!'),
   JWT_TTL: z.coerce.number().min(1, 'JWT_TTL is required!'),
@@ -43,4 +45,5 @@ export const validateEnv = (): ApiConfig => {
   return envSchema.parse(process.env);
 };
 
+export const API_CONFIG = 'API_CONFIG';
 export const ApiConfig = validateEnv();

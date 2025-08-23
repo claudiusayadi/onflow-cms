@@ -1,0 +1,22 @@
+meta {
+  name: Sign in
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:4022/api/v2/auth/signin
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "oloye@teams.local",
+    "password": "Invalid.123@"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
